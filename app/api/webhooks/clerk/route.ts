@@ -63,12 +63,19 @@ export async function POST(req: Request) {
       clerkId: id,
       email: email_addresses[0].email_address,
       username: username!,
-      firstName: first_name !== null ? String(first_name) : '', // Convert to string or use empty string if null
-      lastName: last_name !== null ? String(last_name) : '',   // Convert to string or use empty string if null
+      firstName: first_name ?? '', // Use empty string if first_name is null or undefined
+      lastName: last_name ?? '',   // Use empty string if last_name is null or undefined
       photo: image_url,
     };
 
-    const newUser = await createUser(user);
+    const newUser = await createUser({
+      clerkId: user.clerkId,
+      email: user.email,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      photo: user.photo,
+    });
 
     // Set public metadata
     if (newUser) {
@@ -87,13 +94,18 @@ export async function POST(req: Request) {
     const { id, image_url, first_name, last_name, username } = evt.data;
 
     const user = {
-      firstName: first_name !== null ? String(first_name) : '', // Convert to string or use empty string if null
-      lastName: last_name !== null ? String(last_name) : '',   // Convert to string or use empty string if null
+      firstName: first_name ?? '', // Use empty string if first_name is null or undefined
+      lastName: last_name ?? '',   // Use empty string if last_name is null or undefined
       username: username!,
       photo: image_url,
     };
 
-    const updatedUser = await updateUser(id, user);
+    const updatedUser = await updateUser(id, {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      photo: user.photo,
+    });
 
     return NextResponse.json({ message: "OK", user: updatedUser });
   }
