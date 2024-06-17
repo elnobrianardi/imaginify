@@ -59,23 +59,20 @@ export async function POST(req: Request) {
   if (eventType === "user.created") {
     const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
 
+    // Ensure first_name and last_name are strings or empty strings if null
+    const firstName = first_name || '';
+    const lastName = last_name || '';
+
     const user = {
       clerkId: id,
       email: email_addresses[0].email_address,
       username: username!,
-      firstName: first_name || '', // Ensure it's a string or empty string if null
-      lastName: last_name || '',   // Ensure it's a string or empty string if null
+      firstName,
+      lastName,
       photo: image_url,
     };
 
-    const newUser = await createUser({
-      clerkId: user.clerkId,
-      email: user.email,
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      photo: user.photo,
-    });
+    const newUser = await createUser(user);
 
     // Set public metadata
     if (newUser) {
@@ -93,19 +90,18 @@ export async function POST(req: Request) {
   if (eventType === "user.updated") {
     const { id, image_url, first_name, last_name, username } = evt.data;
 
+    // Ensure first_name and last_name are strings or empty strings if null
+    const firstName = first_name || '';
+    const lastName = last_name || '';
+
     const user = {
-      firstName: first_name || '', // Ensure it's a string or empty string if null
-      lastName: last_name || '',   // Ensure it's a string or empty string if null
+      firstName,
+      lastName,
       username: username!,
       photo: image_url,
     };
 
-    const updatedUser = await updateUser(id, {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      photo: user.photo,
-    });
+    const updatedUser = await updateUser(id, user);
 
     return NextResponse.json({ message: "OK", user: updatedUser });
   }
